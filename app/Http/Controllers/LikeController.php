@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\User;
+use App\Like;
+use Illuminate\Support\Facades\Auth;
+use Session;
 use App\Http\Requests;
 
 class LikeController extends Controller
@@ -13,9 +17,11 @@ class LikeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function show($id)
     {
-        //
+        $like = Like::where('status_id', $id)->where('feedback', 1)->get();
+        $dislike = Like::where('status_id', $id)->where('feedback', 2)->get();
+        return View('like.index')->with('like', $like)->with('dislike', $dislike);
     }
 
     /**
@@ -45,9 +51,46 @@ class LikeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function like($id)
     {
-        //
+        if(Like::where('user_id', Auth::user()->id)->count() == 0) {
+            $like = new Like;
+            $like->user_id = Auth::user()->id;
+            $like->feedback = 1;
+            $like->status_id = $id;
+            $like->save();
+        } else if(Like::where('user_id', Auth::user()->id)->count() == 1) {
+            $like = Like::find($id);
+            $like->user_id = Auth::user()->id;
+            $like->feedback = 1;
+            $like->status_id = $id;
+            $like->save();
+        }
+        return redirect('home/#post-'.$id);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function dislike($id)
+    {
+        if(Like::where('user_id', Auth::user()->id)->count() == 0) {
+            $like = new Like;
+            $like->user_id = Auth::user()->id;
+            $like->feedback = 2;
+            $like->status_id = $id;
+            $like->save();
+        } else if(Like::where('user_id', Auth::user()->id)->count() == 1) {
+            $like = Like::find($id);
+            $like->user_id = Auth::user()->id;
+            $like->feedback = 2;
+            $like->status_id = $id;
+            $like->save();
+        }
+        return redirect('home/#post-'.$id);
     }
 
     /**

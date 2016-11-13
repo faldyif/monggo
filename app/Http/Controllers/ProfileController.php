@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use App\User;
 
 class ProfileController extends Controller
 {
@@ -47,7 +48,8 @@ class ProfileController extends Controller
      */
     public function show($id)
     {
-        //
+        $profile = User::find($id);
+        return View('profile.show')->with('profile', $profile);
     }
 
     /**

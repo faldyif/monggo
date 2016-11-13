@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\User;
+use App\Follow;
+use Illuminate\Support\Facades\Auth;
+use Session;
 use App\Http\Requests;
 
 class FollowController extends Controller
@@ -47,7 +51,17 @@ class FollowController extends Controller
      */
     public function show($id)
     {
-        //
+        if(Follow::where('following_id', $id)->where('user_id', Auth::user()->id)->count())
+        {
+            return redirect('profile/'.$id);
+        }
+        $follow = new Follow;
+        $follow->user_id = Auth::user()->id;
+        $follow->following_id = $id;
+        $follow->save();
+
+        Session::flash('follow',1);
+        return redirect('profile/'.$id);
     }
 
     /**

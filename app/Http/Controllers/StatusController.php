@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\User;
+use App\Follow;
+use App\Status;
+use Session;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests;
 
 class StatusController extends Controller
@@ -36,7 +41,23 @@ class StatusController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'content' => 'required|max:500',
+        ]);
+
+        if(Auth::guest())
+        {
+            return redirect('/');
+        }
+
+        $status = new Status;
+        $status->content = $request->content;
+        $status->user_id = Auth::user()->id;
+        $status->save();
+
+        Session::flash('message', 'Your status has been posted!');
+        return redirect('home');
+
     }
 
     /**
